@@ -7,7 +7,10 @@ const User = require('../models/user').User;
 router.get('/', isLoggedIn, async function(req, res) {
     try {
       let isLoggedin = req.isLoggedIn;
-      const limit = parseInt(req.query.limit);   //for pagination 
+      const sort = req.query.sort;                //Sort data by firstName,lastName,employeeId,organsization
+      const skip = parseInt(req.query.skip);      // Starting Row
+      const limit = parseInt(req.query.limit);   // Ending Row 
+      //Search using FirstName, LastName and employeeID using param object
       let params = {
         ...(req.query.employeeId && {_id: req.query.employeeId}),
         ...(req.query.firstName && {firstName:req.query.firstName}),
@@ -16,7 +19,10 @@ router.get('/', isLoggedIn, async function(req, res) {
       if(!isLoggedin){
         throw ("Please login first");
       }else{
-        var user = await User.find(params).limit(limit);
+        var user = await User.find(params)
+        .skip(skip)
+        .limit(limit)
+        .sort(sort);
         if (!user) throw 'Could not find';
       }
       let users = [];
